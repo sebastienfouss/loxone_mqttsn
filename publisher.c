@@ -1,10 +1,12 @@
 // IP and Port of the MQTT SN Gateway
 #define MQTTSN_GW_URL "/dev/udp/192.168.10.56/1884"
+STREAM* pStream;
 // Client ID
 #define CLIENT_ID "LoxoneMQTTSNClient_Publisher"
 
 // Port of Loxone Virtual Output used to listen to Publish requests
 #define LISTEN_PORT "/dev/udp//9904"
+STREAM *pInStream;
 
 // Couple of timeouts
 #define MQTTSN_GW_TIMEOUT 30
@@ -20,18 +22,7 @@ int gRegisteredTopics = 0;
 char *gTopics[MAX_TOPICS]; // Loxone does not support 2 dimensional array, so let's go for an array of pointers
 int gTopicsIDs[MAX_TOPICS];
 
-// Prepare stream to receive data from Loxone to publish on MQTT-SN Gateway
-STREAM *pInStream;
-sleep(500); // Wait a bit before opening stream, it seems that Loxone sometimes ignore the request if it comes too early
-pInStream = stream_create(LISTEN_PORT,0,0);// create udp stream
 
-// PicoC on Loxone does not support 2 dimensions arrays :(
-int k;
-for (k=0; k<MAX_TOPICS; k++) {
-  gTopics[k] = malloc (MAX_TOPIC_SIZE);
-}
-
-STREAM* pStream;
 
 // Get topic ID, and register it if it does not exist
 int getTopicID (char *topic) {
@@ -217,6 +208,18 @@ int processIncomingRequest(int nCnt, char *message) {
 //
 // Main loop starts here
 //
+
+// Wait a bit before opening stream, it seems that Loxone sometimes ignore the request if it comes too early
+sleep(500);
+
+// Create the stream to listen on Loxone incoming Publish requests
+pInStream = stream_create(LISTEN_PORT,0,0);// create udp stream
+
+// PicoC on Loxone does not support 2 dimensions arrays :(
+int k;
+for (k=0; k<MAX_TOPICS; k++) {
+  gTopics[k] = malloc (MAX_TOPIC_SIZE);
+}
 
 // Close pending connection, if any
 disconnect();
