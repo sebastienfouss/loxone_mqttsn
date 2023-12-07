@@ -10,10 +10,10 @@
 #define MAX_TOPICS 50
 #define MAX_TOPIC_SIZE 50
 
+// Following variables are used to manage topic registration
 int gRegisteredTopics = 0;
-char *gTopics[MAX_TOPICS];
+char *gTopics[MAX_TOPICS]; // Loxone does not support 2 dimensional array, so let's go for an array of pointers
 int gTopicsIDs[MAX_TOPICS];
-int gHeartBeatCounter = 0;
 
 // Prepare stream to receive data from Loxone to publish on MQTT-SN Gateway
 STREAM *pInStream;
