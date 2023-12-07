@@ -1,12 +1,17 @@
+// IP and Port of the MQTT SN Gateway
 #define MQTTSN_GW_URL "/dev/udp/192.168.10.56/1884"
+// Client ID
+#define CLIENT_ID "LoxoneMQTTSNClient_Publisher"
+
+// Port of Loxone Virtual Output used to listen to Publish requests
+#define LISTEN_PORT "/dev/udp//9904"
+
+// Couple of timeouts
 #define MQTTSN_GW_TIMEOUT 30
 #define MQTTSN_GW_CONN_TIMEOUT 3
 #define MQTTSN_GW_DISCONN_TIMEOUT 1
-#define LISTEN_PORT "/dev/udp//9904"
 
-#define CLIENT_ID "LoxoneMQTTSNClient_Publisher"
 #define BUFF_SIZE 500
-
 #define MAX_TOPICS 50
 #define MAX_TOPIC_SIZE 50
 
@@ -231,8 +236,7 @@ while (1) {
          setoutputtext(0,"CONNECTED");
          // Force re-registration of topics, if this results from a server disconnection
          gRegisteredTopics = 0;
-         
-		     sleep (100);
+	 sleep (100);
          break;
       }
    }
@@ -247,7 +251,7 @@ while (1) {
          setoutputtext (2, "GOT DATA !");
          processIncomingRequest(nCnt, szBufferIn);
       } else {
-		     setoutputtext (2, "TIMEOUT !");
+	 setoutputtext (2, "TIMEOUT !");
       }
 
       // Send keepalive packet
