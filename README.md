@@ -11,7 +11,7 @@ In order to implement this, a couple of limitations have to be considered:
 1. <b>Virtual Output:</b> the source port of an UDP connection is unknown to the user, making it impossible to monitor the replies from the server in a bidirectional communication
 2. <b>Virtual Input:</b> can only be a UDP connection
 
-Limitation #2 indicates that we will have to rely on an UDP connection, but how to handle limitation #1 ?
+So using only Virtual Inputs and Outputs is not enough to manage a MQTT connection. How can we proceed ?
 
 A couple of ways:
 
@@ -26,6 +26,7 @@ Pretty easy, it does work, but it requires to setup socat somewhere.
 ### Loxone limitations 2: picoC applications
 1. PicoC is mono threaded only, that is, each picoC block will run in its own thread, but you can't spawn threads within a block. This implies, for bidirectional communication as it is the case with a MQTT server, that we have to create two applications: a publisher and a listener.
 2. UDP sockets cannot be reused between two applications
+Note: PicoC can open a TCP connection, so therotically we could use TCP instead of UDP, at least to communicate with the broker, but this opens another level of complexity: PicoC is not really user friendly for debugging.
 
 ### Implementation
 1. Create 2 listeners on the MQTT broker (1 for Loxone publisher, 1 for Loxone subscriber)
@@ -39,3 +40,17 @@ Pretty easy, it does work, but it requires to setup socat somewhere.
    2. Connect to MQTT broker
    3. On every subscription request, parse it and forward it to MQTT Broker
    4. Monitor MQTT Broker: as soon as data available (that is, data published on a monitored MQTT topic, parse it and forward it to Loxone on port Z
+
+### Choice of a broker
+Next question is: what broker to chose, or more precisely: what gateway to choose to interact with a MQTT broker, considering that we will have to use UDP and MQTT protocol is TCP base ?
+Couple of options here, the main ones:
+- MQTT-SN: a lightweight, UDP-base, MQTT protocol variant
+- COAP: another MQTT-like protocol.
+This project is implemented using MQTT-SN protocol. COAP is a bit too complex to manage it in the limited environment of a PicoC application.
+
+This brings us to the main topic: which broker ?
+Considering that a MQTT-SN "broker" is in essence a gateway to an actual MQTT broker, I decided to use EMQX (emqx.io) that embeds in a single server a MQTT broker, as well as a MQTT-SN (and COAP, etc) gateway.
+
+
+
+  
