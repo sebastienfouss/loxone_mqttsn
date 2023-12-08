@@ -53,4 +53,23 @@ Considering that a MQTT-SN "broker" is in essence a gateway to an actual MQTT br
 
 
 
+# Setup
+
+## EMQX Broker
+
+Install EMQX Broker.
+
+On Cluster Settings > Gateways, enable MQTT-SN gateway.
+
+Make sure to add a second (UDP) listener, as per the picture below.
+
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/9f142efc-3c39-44f5-9ef0-2c8e31c9e806)
+
+
+## Loxone
+
+
+
+
+
   
