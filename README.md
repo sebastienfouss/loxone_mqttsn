@@ -1,5 +1,7 @@
 # loxone_mqttsn
-MQTT-SN client for Loxone
+MQTT-SN client for Loxone.
+
+MQTT-SN specifications available [here](https://www.oasis-open.org/committees/download.php/66091/MQTT-SN_spec_v1.2.pdf).
 
 ### Why a MQTT-SN client for Loxone ?
 Loxone is a great platform, but for there is no possibility to ingegrate it natively with a MQTT broker.
