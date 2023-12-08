@@ -68,6 +68,36 @@ Make sure to add a second (UDP) listener, as per the picture below.
 
 ## Loxone
 
+### Virtual Input
+Add a Virtual Input, name it for example MQTT-SN IN, and set the port (for example, 9903).
+
+### Virtual Output
+Add 2 Virtual Outputs:
+1. MQTT-SN OUT PUBLISH
+ - As address, enter /dev/udp/127.0.0.1/9904
+ - Make sure to enable "Close connection after sending"
+ - Leave the 2 remaining fields (separator, connection command) empty
+4. MQTT-SN OUT SUBSCRIBE
+- As address, enter /dev/udp/127.0.0.1/9902
+- Make sure to enable "Close connection after sending"
+- Leave the 2 remaining fields (separator, connection command) empty
+
+## Pico C code
+Add on an existing or a new page, two picoC blocks:
+- First one named "Subscribe"
+- Second one named "Publish
+
+The output O13 from the "Subscribe" program shall be linked to a Front Detector, then linked to your subscriptions (see below).
+
+In the "Subscribe" block, copy and paste the content from the file subscriber.c.
+In the "Publish" block, copy and paste the content from the file publish.c.
+
+Make sure to modify the URL address of your MQTT-SN gateway, and to adapt the ports if needed.
+
+End result should be similar to this:
+
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/e8768069-99b2-475b-a25e-9acffdd316bb)
+
 
 
 
