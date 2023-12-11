@@ -125,8 +125,9 @@ Finally, make sure to connect the Virtual Output Command to the Front Detection 
 ![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/6ca6fe49-e6a6-4b17-831a-8b34d1beba06)
 
 ### Receive data from a subscribed topic
-FILL ME
+In Virtual Input "MQTT-SN IN", add a Virtual Input Command.
+Fill the command detection as usual, for example:
 
-
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/3f8075be-8f04-4dcb-9290-5d1c9caf28b8)
 
   
