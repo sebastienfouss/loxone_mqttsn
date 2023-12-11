@@ -9,6 +9,7 @@
 // Stream reading/writing timeout, in seconds
 #define MQTTSN_GW_TIMEOUT 1
 #define MQTTSN_GW_MSG_TIMEOUT 10
+#define MQTTSN_GW_CONN_TIMEOUT 10
 
 // Max buffer size
 #define BUFF_SIZE 1000
