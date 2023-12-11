@@ -215,7 +215,7 @@ int processPublishMessage(int nCnt, char *_message) {
 			stream_flush (pLoxoneOutStream);
 			// Set status
 			strncpy (message, &_message[7+l], nCnt-7-l);
-			sprintf (status, "Published: %s/%s", gTopics[i], message);
+			sprintf (status, "Got msg: %s/%s", gTopics[i], message);
 			setoutputtext (1, status);
 			break;
 		}
@@ -279,8 +279,8 @@ while (1) {
 			gRegisteredTopics = 0;
 			// Subscribe topics by sending a pulse on Output 13
 			setoutput (12, 1);
-			sleep (300);
-			setoutput (12, 0);
+            sleep (300);
+            setoutput (12, 0);
 			break;
 		}
 	}
@@ -300,17 +300,17 @@ while (1) {
 		sleep (50);
 
 		// Process data received from MQTT-SN gateway (should be Publish messages)
-		setoutputtext (2, "");
+        setoutputtext (2, "");
 		nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,MQTTSN_GW_MSG_TIMEOUT*1000);
 		if (nCnt > 0) {
 			setoutputtext (1, "");
 			szBufferIn[nCnt] = 0;
 			processPublishMessage (nCnt, szBufferIn);
-			continue;
-		}
+            continue;
+		} // else 
+		//	sleep (50);
 
-		// If no message received within (MQTTSN_GW_MSG_TIMEOUT*1000) seconds, send a PING request
-		setoutputtext (2, "KEEPALIVE");
+        setoutputtext (2, "KEEPALIVE");
 		if (keepalive() == 1) {
 			// Keep alive ok
 			sleep (100);
