@@ -4,7 +4,7 @@ MQTT-SN client for Loxone.
 MQTT-SN specifications available [here](https://www.oasis-open.org/committees/download.php/66091/MQTT-SN_spec_v1.2.pdf).
 
 ### Why a MQTT-SN client for Loxone ?
-Loxone is a great platform, but for there is no possibility to ingegrate it natively with a MQTT broker.
+Loxone is a great platform, but for there is no possibility to integrate it natively with a MQTT broker.
 Solutions exist (for example, a Node Red gateway between MQTT broker and Loxone), but I wanted a solution that does not imply an intermediate layer between Loxone and the broker.
 
 In order to implement this, a couple of limitations have to be considered:
@@ -31,8 +31,11 @@ Pretty easy, it does work, but it requires to setup socat somewhere.
 Note: PicoC can open a TCP connection, so therotically we could use TCP instead of UDP, at least to communicate with the broker, but this opens another level of complexity: PicoC is not really user friendly for debugging.
 
 ### Implementation
-1. Create 2 listeners on the MQTT broker (1 for Loxone publisher, 1 for Loxone subscriber)
-2. On Loxone, create 2 Virtual Outputs ("MQTT-SN Publisher" with port UDP X, and "MQTT-SN Subscriber" with port UDP Y), and a Virtual Input "MQTT-SN Publisher" with port UDP Z.
+
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/6beb3953-6c7e-427b-9563-885bebff3805)
+
+1. Create 2 listeners on the MQTT-SN gateway (1 for Loxone publisher, 1 for Loxone subscriber)
+2. On Loxone, create a Virtual Input "MQTT-SN Publisher" with port UDP X, and 2 Virtual Outputs ("MQTT-SN Publisher" with target port UDP Y, and "MQTT-SN Subscriber" with target port UDP Z
 3. On Publisher Application, workflow will be:
    1. Create a UDP connection on port X
    2. Connect to MQTT broker
