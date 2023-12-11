@@ -8,6 +8,7 @@
 
 // Stream reading/writing timeout, in seconds
 #define MQTTSN_GW_TIMEOUT 1
+#define MQTTSN_GW_MSG_TIMEOUT 10
 
 // Max buffer size
 #define BUFF_SIZE 1000
@@ -277,6 +278,8 @@ while (1) {
 			gRegisteredTopics = 0;
 			// Subscribe topics by sending a pulse on Output 13
 			setoutput (12, 1);
+			sleep (300);
+			setoutput (12, 0);
 			break;
 		}
 	}
@@ -296,14 +299,17 @@ while (1) {
 		sleep (50);
 
 		// Process data received from MQTT-SN gateway (should be Publish messages)
-		nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,5000);
+		setoutputtext (2, "");
+		nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,MQTTSN_GW_MSG_TIMEOUT*1000);
 		if (nCnt > 0) {
 			setoutputtext (1, "");
 			szBufferIn[nCnt] = 0;
 			processPublishMessage (nCnt, szBufferIn);
-		} else 
-			sleep (50);
+			continue;
+		}
 
+		// If no message received within (MQTTSN_GW_MSG_TIMEOUT*1000) seconds, send a PING request
+		setoutputtext (2, "KEEPALIVE");
 		if (keepalive() == 1) {
 			// Keep alive ok
 			sleep (100);
