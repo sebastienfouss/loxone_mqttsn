@@ -105,8 +105,14 @@ End result should be similar to this:
 
 ![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/c474a96a-5e08-42cc-b6b0-14491cc0694a)
 
+### Publish data to MQTT
+FILL ME
 
+### Subscribe to a topic
+FILL ME
 
+### Receive data from a subscribed topic
+FILL ME
 
 
 
