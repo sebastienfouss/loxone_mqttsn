@@ -103,7 +103,8 @@ Make sure to modify the URL address of your MQTT-SN gateway, and to adapt the po
 
 End result should be similar to this:
 
-![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/e8768069-99b2-475b-a25e-9acffdd316bb)
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/c474a96a-5e08-42cc-b6b0-14491cc0694a)
+
 
 
 
