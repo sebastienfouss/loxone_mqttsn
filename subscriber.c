@@ -211,11 +211,11 @@ int processPublishMessage(int nCnt, char *_message) {
 
 		if (gTopicsIDs[i] == topic) {
 			// Publish the topic + payload message to Loxone listener
+			strncpy (message, &_message[7+l], nCnt-7-l);
+			sprintf (status, "%s/%s", gTopics[i], message);
 			stream_write (pLoxoneOutStream, status, strlen(status)); // write to output buffer
 			stream_flush (pLoxoneOutStream);
 			// Set status
-			strncpy (message, &_message[7+l], nCnt-7-l);
-			sprintf (status, "Got msg: %s/%s", gTopics[i], message);
 			setoutputtext (1, status);
 			break;
 		}
