@@ -35,16 +35,18 @@ Note: PicoC can open a TCP connection, so therotically we could use TCP instead 
 ![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/6beb3953-6c7e-427b-9563-885bebff3805)
 
 1. Create 2 listeners on the MQTT-SN gateway (1 for Loxone publisher, 1 for Loxone subscriber)
-2. On Loxone, create a Virtual Input "MQTT-SN Publisher" with port UDP X, and 2 Virtual Outputs ("MQTT-SN Publisher" with target port UDP Y, and "MQTT-SN Subscriber" with target port UDP Z
-3. On Publisher Application, workflow will be:
-   1. Create a UDP connection on port X
-   2. Connect to MQTT broker
-   3. Monitor port X: as soon as data is available (that is, data user is willing to publish to MQTT), parse it and forward it to MQTT broker
-4. On Subscriber Application, workflow will be:
-   1. Create a UDP connection on port Y
-   2. Connect to MQTT broker
-   3. On every subscription request, parse it and forward it to MQTT Broker
-   4. Monitor MQTT Broker: as soon as data available (that is, data published on a monitored MQTT topic, parse it and forward it to Loxone on port Z
+2. On Loxone, create a Virtual Input "MQTT-SN Publisher" with port UDP X, and 2 Virtual Outputs ("MQTT-SN Publisher" with target port UDP Y, and "MQTT-SN Subscriber" with target port UDP Z)
+3. On Publisher application, workflow will be:
+   1. Open an ingress UDP connection on port Z
+   2. Open an egress UDP stream to MQTT-SN gateway
+   3. Monitor port Z: as soon as data is available (that is, data user is willing to publish to MQTT), parse it and forward it to MQTT-SN gateway
+   4. Keepalive is also managed from the Publisher application
+4. On Subscriber application, workflow will be:
+   1. Open an ingress UDP connection on port Y
+   2. Open an egress UDP stream to MQTT-SN gateway
+   3. Open an egress UDP stream to Loxone on port X
+   3. On every subscription request, parse it and forward it to MQTT-SN gateway
+   4. Monitor MQTT Broker: as soon as data available (that is, data published on a monitored MQTT topic, parse it and forward it to Loxone on port X
 
 ### Choice of a broker
 Next question is: what broker to chose, or more precisely: what gateway to choose to interact with a MQTT broker, considering that we will have to use UDP and MQTT protocol is TCP base ?
