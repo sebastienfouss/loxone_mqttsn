@@ -106,7 +106,11 @@ End result should be similar to this:
 ![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/c474a96a-5e08-42cc-b6b0-14491cc0694a)
 
 ### Publish data to MQTT
-FILL ME
+In Virtual Output "MQTT-SN OUT PUBLISH", add a Virtual Output Command.
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/db6de496-2537-4266-9d38-852b04d604b0)
+
+In the Virtual Output Command, set "Command with ON" as a typical MQTT publication, ie topic/payload.
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/8cbbbde2-535d-40b1-8ac1-c59c72c74343)
 
 ### Subscribe to a topic
 FILL ME
