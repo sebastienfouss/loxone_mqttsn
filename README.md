@@ -3,6 +3,10 @@ MQTT-SN client for Loxone.
 
 MQTT-SN specifications available [here](https://www.oasis-open.org/committees/download.php/66091/MQTT-SN_spec_v1.2.pdf).
 
+### Disclaimers
+- I am not affiliated with Loxone Electronics GmbH
+- Use this code at your own risk
+  
 ### Why a MQTT-SN client for Loxone ?
 Loxone is a great platform, but for there is no possibility to integrate it natively with a MQTT broker.
 Solutions exist (for example, a Node Red gateway between MQTT broker and Loxone), but I wanted a solution that does not imply an intermediate layer between Loxone and the broker.
