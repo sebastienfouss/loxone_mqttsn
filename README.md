@@ -111,9 +111,18 @@ In Virtual Output "MQTT-SN OUT PUBLISH", add a Virtual Output Command.
 
 In the Virtual Output Command, set "Command with ON" as a typical MQTT publication, ie topic/payload.
 ![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/8cbbbde2-535d-40b1-8ac1-c59c72c74343)
+You can use <v> etc for payload, as usual for a Virtual Output.
 
 ### Subscribe to a topic
-FILL ME
+In Virtual Output "MQTT-SN OUT SUBSCRIBE", add a Virtual Output Command.
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/cb6add79-5ac8-46d7-9f92-0e3b2c5015aa)
+
+In the Virtual Output Command, fill "Command with ON" with the requested MQTT topic.
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/a491ea88-e3c1-4478-9fca-30c590570373)
+
+Finally, make sure to connect the Virtual Output Command to the Front Detection linked to Publisher bloc.
+
+![image](https://github.com/sebastienfouss/loxone_mqttsn/assets/14035269/6ca6fe49-e6a6-4b17-831a-8b34d1beba06)
 
 ### Receive data from a subscribed topic
 FILL ME
