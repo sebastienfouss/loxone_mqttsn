@@ -8,7 +8,7 @@
 
 // Stream reading/writing timeout, in seconds
 #define MQTTSN_GW_TIMEOUT 1
-#define MQTTSN_GW_MSG_TIMEOUT 10
+#define MQTTSN_GW_MSG_TIMEOUT 1
 #define MQTTSN_GW_CONN_TIMEOUT 10
 
 // Max buffer size
@@ -195,7 +195,7 @@ int processPublishMessage(int nCnt, char *_message) {
 	if (_message[1+l] == 0x17) {
 	   return 1;
 	}
-	
+
 	// Process message
 	if (_message[1+l] != 0x0c) {
 	   sprintf (status, "Unexpected message: %d %d %d", _message[0+l],_message[1+l],_message[2+l]);
@@ -210,6 +210,7 @@ int processPublishMessage(int nCnt, char *_message) {
 	for (i=0; i<gRegisteredTopics; i++) {
 
 		if (gTopicsIDs[i] == topic) {
+
 			// Publish the topic + payload message to Loxone listener
 			strncpy (message, &_message[7+l], nCnt-7-l);
 			sprintf (status, "%s/%s", gTopics[i], message);
@@ -289,7 +290,7 @@ while (1) {
 
 		// Process all subscription requests   
 		while (1) {
-			nCnt = stream_read(pLoxoneInStream,szBufferIn,BUFF_SIZE,1000);
+			nCnt = stream_read(pLoxoneInStream,szBufferIn,BUFF_SIZE,5000);
 			if (nCnt > 0) {
 				szBufferIn[nCnt] = 0;
 				processSubscriptionRequest(nCnt, szBufferIn);
@@ -299,27 +300,31 @@ while (1) {
 		}
 		sleep (50);
 
-		// Process data received from MQTT-SN gateway (should be Publish messages)
-        setoutputtext (2, "");
-		nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,MQTTSN_GW_MSG_TIMEOUT*1000);
-		if (nCnt > 0) {
-			setoutputtext (1, "");
-			szBufferIn[nCnt] = 0;
-			processPublishMessage (nCnt, szBufferIn);
-            continue;
-		} // else 
-		//	sleep (50);
-
-        setoutputtext (2, "KEEPALIVE");
-		if (keepalive() == 1) {
-			// Keep alive ok
-			sleep (100);
-		}
-		else {
-			// Connection dead, reconnect
-			setoutputtext(0,"CONNECTION DEAD");
-			sleep (1000);
-			break;
-		}
+		while (1) {
+			// Process data received from MQTT-SN gateway (should be Publish messages)
+            		// If no data received for 25 seconds, send a keepalive
+            		// If keepalive fails, restart connection
+        		setoutputtext (2, "");
+			nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,25000);
+			if (nCnt > 0) {
+				setoutputtext (1, "");
+				szBufferIn[nCnt] = 0;
+				processPublishMessage (nCnt, szBufferIn);
+            			continue;
+			} else {
+		    		setoutputtext (2, "KEEPALIVE");
+				if (keepalive() == 1) {
+					// Keep alive ok
+					sleep (10);
+				}
+				else {
+					// Connection dead, reconnect
+					setoutputtext(0,"CONNECTION DEAD");
+					sleep (1000);
+					break;
+                		}
+			}
+        	}
 	}
 }
+
