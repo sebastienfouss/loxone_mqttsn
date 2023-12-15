@@ -11,6 +11,9 @@
 #define MQTTSN_GW_MSG_TIMEOUT 1
 #define MQTTSN_GW_CONN_TIMEOUT 10
 
+// Heartbeat topic
+#define HEARTBEAT_TOPIC "loxone/mqttsn/subscriber/heartbeat"
+
 // Max buffer size
 #define BUFF_SIZE 1000
 
@@ -74,19 +77,23 @@ int getTopicID (char *topic) {
 	stream_flush (pMQTTSNStream);
 
 	// Wait for answer
-	nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,MQTTSN_GW_TIMEOUT*1000); // read stream, will either reply with 0x18 (DISCONNECT OK) or not reply (no ongoing connection), both are ok
-
-	if ((szBufferIn[1] != 0x0B)|| (szBufferIn[6] != 0x00)) {
-		// ERROR
-		sprintf (status, "Topic registration Error: %d - %s %d", gRegisteredTopics, topic, szBufferIn[6]);
-		setoutputtext (1, status);
-	} else {
-		// OK, topic registered on MQTT-SN Gateway
-		strcpy (&gTopics[gRegisteredTopics][0], topic);
-		gTopicsIDs[gRegisteredTopics] = (szBufferIn[2] << 8) + szBufferIn[3];
-		topicID = gTopicsIDs[gRegisteredTopics];
-		gRegisteredTopics++;
+	while (1) {
+		nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,MQTTSN_GW_TIMEOUT*1000); // read stream, will either reply with 0x18 (DISCONNECT OK) or not reply (no ongoing connection), both are ok
+	
+	        // Skip publish messages that can already come in
+	    	if (szBufferIn[1] != 0x0B) {
+			// Not REGACK message
+	            	continue;
+		} else {
+			// OK, topic registered on MQTT-SN Gateway
+			strcpy (&gTopics[gRegisteredTopics][0], topic);
+			gTopicsIDs[gRegisteredTopics] = (szBufferIn[2] << 8) + szBufferIn[3];
+			topicID = gTopicsIDs[gRegisteredTopics];
+			gRegisteredTopics++;
+	            	break;
+		} 
 	}
+	
 	return topicID;
 }
 
@@ -174,6 +181,35 @@ int disconnect() {
 	stream_close (pMQTTSNStream);
    
 	return 1;
+}
+
+void publish_heartbeat() {
+
+   int i;
+   char payload[2];
+   char szBuffer[BUFF_SIZE];
+   int topicID;
+   
+   // HEARTBEAT_TOPIC
+   topicID = getTopicID (HEARTBEAT_TOPIC);
+   payload = "1";
+
+   // Prepare message
+   i = 1;
+   // We'll update message length afterwards
+   // TODO: handle length > 255
+   szBuffer[i++] = 0x0C; // Publish
+   szBuffer[i++] = 0x00; // Flag
+   szBuffer[i++] = (topicID >> 8); // Topic ID
+   szBuffer[i++] = (topicID % 256); // Topic ID
+   szBuffer[i++] = 0x00; // MsgID
+   szBuffer[i++] = 0x01; // MsgID
+   strcpy(&szBuffer[i], payload);
+   szBuffer[0] = i + strlen(payload);
+        
+   stream_write (pMQTTSNStream, szBuffer, szBuffer[0]); // write to output buffer
+   stream_flush (pMQTTSNStream);
+
 }
 
 // Process publish message received from MQTT-SN gateway
@@ -267,10 +303,14 @@ int nCnt;
 char szBufferIn[BUFF_SIZE];
 char status[300];
 
+int force_reconnect = 0;
+int ct, ct2;
+
 while (1) {
 
 	// Connect
 	while (1) {
+        setoutputtext (0, "CONNECTING");
 		if (connect() == -1) {
 			setoutputtext(0,"Connection failed");
 			sleep (MQTTSN_GW_CONN_TIMEOUT);
@@ -282,11 +322,12 @@ while (1) {
 			setoutput (12, 1);
             sleep (300);
             setoutput (12, 0);
+            force_reconnect = 0;
 			break;
 		}
 	}
 
-	while (1) {
+	while (force_reconnect == 0) {
 
 		// Process all subscription requests   
 		while (1) {
@@ -294,25 +335,34 @@ while (1) {
 			if (nCnt > 0) {
 				szBufferIn[nCnt] = 0;
 				processSubscriptionRequest(nCnt, szBufferIn);
+                sleep (10);
 			} else {
 				break;
 			}
 		}
 		sleep (50);
+        ct = getcurrenttime();
 
 		while (1) {
 			// Process data received from MQTT-SN gateway (should be Publish messages)
-            		// If no data received for 25 seconds, send a keepalive
-            		// If keepalive fails, restart connection
-        		setoutputtext (2, "");
+            // If no data received for 25 seconds, send a keepalive
+            // If keepalive fails, restart connection
+        	setoutputtext (2, "");
+            ct2 = getcurrenttime();
+            if (ct2 - ct > 30) {
+               ct = ct2;
+               // Publish heartbeat
+               publish_heartbeat ();
+            }
 			nCnt = stream_read(pMQTTSNStream,szBufferIn,BUFF_SIZE,25000);
 			if (nCnt > 0) {
 				setoutputtext (1, "");
 				szBufferIn[nCnt] = 0;
-				processPublishMessage (nCnt, szBufferIn);
-            			continue;
+				if (processPublishMessage (nCnt, szBufferIn) == -1)
+					break;
+            	continue;
 			} else {
-		    		setoutputtext (2, "KEEPALIVE");
+		    	setoutputtext (2, "KEEPALIVE");
 				if (keepalive() == 1) {
 					// Keep alive ok
 					sleep (10);
@@ -320,11 +370,11 @@ while (1) {
 				else {
 					// Connection dead, reconnect
 					setoutputtext(0,"CONNECTION DEAD");
-					sleep (1000);
+					force_reconnect = 1;
 					break;
-                		}
+                }
 			}
-        	}
+        }
 	}
 }
 
